@@ -1,1 +1,9 @@
-{}
+{
+  "uploadConfigs": {
+    "release": {
+      "url": "https://www.cubbles.world/sandbox",
+      "proxy": "",
+      "debug": false
+    }
+  }
+}

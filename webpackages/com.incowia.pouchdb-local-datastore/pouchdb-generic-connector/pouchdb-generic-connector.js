@@ -55,31 +55,20 @@
          * @private
          */
         _init : function() {
-            var self = this
-            var dbName = this.getDbConfig().dbName
-            var remotedbName = this.getDbConfig().remotedb
-            var indexList = this.getDbConfig().indexList
+            var config = this.getDbConfig()
+            var dbName = config.dbName
+            var indexList = config.indexList
 
             //create db instance, throw error if no db name is given
             if((typeof  dbName === 'string') && (dbName.length > 0)) {
                 this.db = new PouchDB(dbName)
-                this._find(self.getFind())
+                this._find(this.getFind())
             }else{
-                console.error(new TypeError('slot "config" needs to have non empty string property "dbName"'))
+                console.error(new Error('slot "config" needs to have non empty string property "dbName"'))
                 return
             }
 
-            //register changes listener to set output slot "resultData" after every change
-            var changes = this.db.changes({
-                since : 'now',
-                live : true,
-                include_docs : false
-            })
-            changes.on('change', function(change){
-                console.log('change on database docs detected.', change)
-                //set output slot "resultData" with new data
-                self._find(self.getFind())
-            })
+            this._enableChangesListener(true)
 
             //create db index if there is a value provided in input slot "index"
             if (indexList) {
@@ -87,12 +76,7 @@
             }
 
             //synchronize from remotedb if any is given
-            if(remotedbName && remotedbName.length > 0) {
-                var remoteDb = new PouchDB(remotedbName, {ajax : {withCredentials:false}})
-                this.db.replicate.from(remoteDb).on('error', function(err){
-                    console.error('failed to replicate from remotedb: ', err)
-                })
-            }
+            this._synchronizeDataFromCloud()
         },
 
         /**
@@ -108,7 +92,7 @@
                 db.createIndex({index: index}).then(function(result) {
                     console.log('index created: ', result)
                 }).catch(function(err){
-                    console.log('error while creating index: ', err)
+                    console.error('error while creating index: ', err)
                 })
             })
 
@@ -119,16 +103,34 @@
          * @private
          */
         _synchronizeDataFromCloud : function() {
-            var remoteDBUrl = this.getDbConfig().remotedb
-            var remoteDB = new PouchDB(remoteDBUrl)
-            var localDB = this.db
-            var self = this
+            var config = this.getDbConfig()
+            if (_.has(config, 'replication.source') && config.replication.source.length > 0) {
+                var remoteDBUrl = config.replication.source
+                var options = config.replication.options || {}
+                var suppressChanges = config.replication.suppressChanges || true
+                var remoteDB = new PouchDB(remoteDBUrl)
+                var localDB = this.db
+                var self = this
 
-            localDB.replicate.from(remoteDB).on('complete', function() {
-                self._find(self.getFind())
-            }).on('error', function(err) {
-                console.log('error replicating remote db: ', err)
-            })
+                //if there is the changes flag set to true disable changesListener
+                if (suppressChanges) {
+                    this._disableChangesListener()
+                }
+
+                _.merge(options, {ajax : {withCredentials:false}})
+
+                localDB.replicate.from(remoteDB, options).on('complete', function() {
+                    self._find(self.getFind())
+                    self._enableChangesListener()
+                }).on('error', function(err) {
+                    self._enableChangesListener()
+                    console.error('error replicating remote db: ', err)
+                })
+            } else {
+                console.error(
+                    new Error('slot "dbConfig" needs to have string property "replication.source" for replicating data')
+                )
+            }
         },
 
         /**
@@ -149,6 +151,50 @@
                 console.log('error while running find query: ', err)
             })
         },
+
+        /**
+         * Enable changes listener. This will set the output slot "resultData" each time a change in the db occurs
+         * @param {boolean} force If true destroy existing listener
+         * @private
+         */
+        _enableChangesListener : function(force) {
+            var self = this
+            force = force || false
+
+            //check, if there is already a changes listener applied
+            if (this.changes && !force) {
+                console.warn('There is already a changes listener applied')
+                return
+            } else if (this.changes && force) {
+                this._disableChangesListener()
+            }
+
+            //register changes listener to set output slot "resultData" after every change
+            var changes = this.db.changes({
+                since : 'now',
+                live : true,
+                include_docs : false
+            })
+            changes.on('change', function(change){
+                console.log('change on database docs detected.', change)
+                //set output slot "resultData" with new data
+                self._find(self.getFind())
+            })
+
+            this.changes = changes
+        },
+
+        /**
+         * Disable canges listener
+         * @private
+         */
+        _disableChangesListener : function() {
+            if (this.changes) {
+                this.changes.cancel()
+                this.changes = null
+            }
+        }
+
 
     });
 }());

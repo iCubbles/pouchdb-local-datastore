@@ -112,7 +112,7 @@ browser using the PouchDB library.</div>
         });
 
         btn_find.addEventListener('click', function() {
-            var value = find.value.length > 0 ? find.value : "{}";
+            var value = find.value.length > 0 ? find.value : null;
             pouchdb_generic_connector.setFind(JSON.parse(value));
         });
 

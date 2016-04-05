@@ -47,6 +47,11 @@
             ],
             "value": {
               "dbName": "",
+              "replication" : {
+                "source" : "",
+                "options" : {},
+                "suppressChanges" : true
+              },
               "remotedb": "",
               "indexList": []
             }
