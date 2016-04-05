@@ -31,7 +31,7 @@
               "pouchdb-generic-connector.html"
             ],
             "dependencies": [
-              "cubx.core.rte@1.5.0/cubxpolymer/main",
+              "cubx.core.rte@1.7.0/cubxpolymer/main",
               "pouchdb-5.1.0@1.0.1/pouchdb/html-import",
               "pouchdb-find-0.9.0@1.0.0/pouchdb-find/html-import",
               "lodash-3.10.1@1.0.1/lodash/html-import"
