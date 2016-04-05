@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>&lt;pouchdb-generic-connector&gt;</title>
+
+    <script src="../../../cubx.core.rte@1.5.0/webcomponents/webcomponents-lite.js"></script>
+
+    <!--
+        Declare a CRCInit-Object used to initialize the CRC (Client-Runtime-Container):
+        * rootDependencies //a string array; string pattern: webpackageId/artifactId/endpointId
+        ** to refer to artifacts of this webpackage, use 'this' as webpackageId
+    -->
+    <script>
+        window.cubx = {
+            CRCInit: {
+                rootDependencies: [
+                    "this/pouchdb-generic-connector/html-import"
+                ]
+            }
+        }
+    </script>
+
+    <!--
+        Refer to the crc-loader artifact from a Cubbles-Base.
+        Take care: All other dependencies are expected to be available within the same Base!
+
+        Want to add a 'main' -script to be executed after the dependencies have been loaded?
+        If yes, add the following attribute: data-crc-main="js/my-script.js"
+    -->
+    <script src="../../../cubx.core.rte@1.5.0/crc-loader/js/main.js" data-CRCInit.loadCIF="true"></script>
+
+    <!-- include jquery from cdn for json view-->
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css">
+    <script src="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.js"></script>
+</head>
+<body>
+<!--
+    The cubbles client-runtime-container is bound to the next element.
+    Place Cubbles-Component there as child element.
+    Note: Currently there is only one element supported. This will change in future (@see PLAT-205).
+-->
+<h1>&lt;pouchdb-generic-connector&gt;</h1>
+<div>The &lt;pouchdb-generic-connector&gt; elementary component does not have a view. It provides persistence of data in local
+browser using the PouchDB library.</div>
+
+<h2>Demo</h2>
+<p>Hint: Use valid JSON notation for objects</p>
+<div style="width:100%;">
+    <div style="width:45%;float:left;margin-right: 10px;">
+        <form>
+            <label for="dbconfig"><h3>dbConfig (Object):</h3></label>
+            <textarea style="width:100%;height:50px;" id="dbconfig">{"dbName":"myDatabase","indexList":[{"fields":["docType"]}]}</textarea>
+            <div style="float:right;"><button type="button" id="btn_dbconfig" disabled>Set</button></div>
+            <label for="find"><h3>find (Object):</h3></label>
+            <textarea style="width:100%;height:50px;" id="find">{"selector":{"docType":"testDoc"}}</textarea>
+            <div style="float:right;"><button type="button" id="btn_find" disabled>Set</button></div>
+            <label for="bulkdocs"><h3>bulkDocs (Object):</h3></label>
+            <textarea style="width:100%;height:50px;" id="bulkdocs">[{"title":"blob","docType":"testDoc"},{"title":"blubb","docType":"testDoc"}]</textarea>
+            <div style="float:right;"><button type="button" id="btn_bulkdocs" disabled>Set</button></div>
+        </form>
+    </div>
+    <div style="width:45%;float:left;margin-left: 10px;">
+        <form>
+            <label for="resultdata"><h3>resultData (Object):</h3></label>
+            <textarea id="resultdata" style="width:100%; height:50px;"></textarea>
+        </form>
+        <h3>Formatted resultData:</h3>
+        <div id="jsonview"></div>
+    </div>
+</div>
+
+<div cubx-core-crc>
+     <pouchdb-generic-connector></pouchdb-generic-connector>
+</div>
+
+<script>
+    (function(){
+        'use strict';
+
+        var dbconfig = document.getElementById('dbconfig');
+        var find = document.getElementById('find');
+        var index = document.getElementById('index');
+        var bulkdocs = document.getElementById('bulkdocs');
+        var resultdata = document.getElementById('resultdata');
+        var btn_dbconfig = document.getElementById('btn_dbconfig');
+        var btn_find = document.getElementById('btn_find');
+        var btn_bulkdocs = document.getElementById('btn_bulkdocs');
+        var jsonview = document.getElementById('jsonview');
+        var pouchdb_generic_connector = document.getElementsByTagName('pouchdb-generic-connector')[0];
+
+
+        document.addEventListener('cifReady', function(){
+            btn_dbconfig.removeAttribute('disabled');
+            btn_bulkdocs.removeAttribute('disabled');
+            btn_find.removeAttribute('disabled');
+        });
+
+        pouchdb_generic_connector.addEventListener('cifModelChange', function(event) {
+            if(event.detail.slot === 'resultData'){
+                resultdata.value = JSON.stringify(event.detail.payload);
+                $(jsonview).JSONView(event.detail.payload);
+            }
+        });
+
+        btn_dbconfig.addEventListener('click', function() {
+            var value = dbconfig.value.length > 0 ? dbconfig.value : "{}";
+            pouchdb_generic_connector.setDbConfig(JSON.parse(value));
+        });
+
+        btn_find.addEventListener('click', function() {
+            var value = find.value.length > 0 ? find.value : "{}";
+            pouchdb_generic_connector.setFind(JSON.parse(value));
+        });
+
+        btn_bulkdocs.addEventListener('click', function() {
+            var value = bulkdocs.value.length > 0 ? bulkdocs.value : "{}";
+            pouchdb_generic_connector.setBulkDocs(JSON.parse(value));
+        });
+    })();
+</script>
+
+</body>
+</html>

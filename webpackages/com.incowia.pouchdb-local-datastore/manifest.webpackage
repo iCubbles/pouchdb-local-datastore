@@ -5,27 +5,76 @@
   "modelVersion": "8.3.0",
   "docType": "webpackage",
   "author": {
-    "name": "Philipp Wagnert",
+    "name": "Philipp Wagner",
     "email": "philipp.wagner@incowia.com"
   },
   "license": "MIT",
   "keywords": [],
   "man": [],
   "artifacts": {
-    "apps": [
+    "elementaryComponents": [
       {
-        "artifactId": "app",
-        "description": "This is a simple pre-generated app.",
+        "artifactId": "pouchdb-generic-connector",
+        "description": "Provides persistent data with using pouchDB",
         "runnables": [
           {
-            "name": "app",
-            "path": "/index.html",
-            "description": "Call this app as a simple demo."
+            "name": "demo",
+            "path": "/demo/index.html",
+            "description": "Demo app..."
+          }
+        ],
+        "endpoints": [
+          {
+            "endpointId": "html-import",
+            "description": "This is recommended for you use with webcomponents.",
+            "resources": [
+              "pouchdb-generic-connector.html"
+            ],
+            "dependencies": [
+              "cubx.core.rte@1.5.0/cubxpolymer/main",
+              "pouchdb-5.1.0@1.0.1/pouchdb/html-import",
+              "pouchdb-find-0.9.0@1.0.0/pouchdb-find/html-import",
+              "lodash-3.10.1@1.0.1/lodash/html-import"
+            ]
+          }
+        ],
+        "slots": [
+          {
+            "slotId": "dbConfig",
+            "type": "object",
+            "direction": [
+              "input"
+            ],
+            "value": {
+              "dbName": "",
+              "remotedb": "",
+              "indexList": []
+            }
+          },
+          {
+            "slotId": "resultData",
+            "type": "object",
+            "direction": [
+              "output"
+            ]
+          },
+          {
+            "slotId": "bulkDocs",
+            "type": "object",
+            "direction": [
+              "input"
+            ]
+          },
+          {
+            "slotId": "find",
+            "type": "object",
+            "direction": [
+              "input"
+            ]
           }
         ]
       }
     ],
-    "elementaryComponents": [],
     "compoundComponents": [],
     "utilities": []
   }
