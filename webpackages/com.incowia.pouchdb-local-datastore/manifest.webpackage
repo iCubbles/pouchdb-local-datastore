@@ -52,7 +52,6 @@
                 "options" : {},
                 "suppressChanges" : true
               },
-              "remotedb": "",
               "indexList": []
             }
           },
