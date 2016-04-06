@@ -76,6 +76,13 @@
             "direction": [
               "input"
             ]
+          },
+          {
+            "slotId": "status",
+            "type": "string",
+            "direction": [
+              "output"
+            ]
           }
         ]
       }

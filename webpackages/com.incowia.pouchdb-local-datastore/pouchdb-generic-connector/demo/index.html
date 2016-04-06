@@ -65,6 +65,8 @@ browser using the PouchDB library.</div>
     </div>
     <div style="width:45%;float:left;margin-left: 10px;">
         <form>
+            <label for="status"><h3>status (String):</h3></label>
+            <textarea id="status" style="width:100%; height:50px;"></textarea>
             <label for="resultdata"><h3>resultData (Object):</h3></label>
             <textarea id="resultdata" style="width:100%; height:50px;"></textarea>
         </form>
@@ -86,6 +88,7 @@ browser using the PouchDB library.</div>
         var index = document.getElementById('index');
         var bulkdocs = document.getElementById('bulkdocs');
         var resultdata = document.getElementById('resultdata');
+        var status = document.getElementById('status');
         var btn_dbconfig = document.getElementById('btn_dbconfig');
         var btn_find = document.getElementById('btn_find');
         var btn_bulkdocs = document.getElementById('btn_bulkdocs');
@@ -103,6 +106,9 @@ browser using the PouchDB library.</div>
             if(event.detail.slot === 'resultData'){
                 resultdata.value = JSON.stringify(event.detail.payload);
                 $(jsonview).JSONView(event.detail.payload);
+            }
+            if(event.detail.slot === 'status'){
+                status.value = event.detail.payload;
             }
         });
 

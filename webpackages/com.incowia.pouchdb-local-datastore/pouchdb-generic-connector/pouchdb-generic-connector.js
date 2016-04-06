@@ -14,6 +14,14 @@
 
         _cubxReady : false,
 
+        //used to provide internal status of the component via output slot "status"
+        status : {
+            idle : 'idle',
+            pending : 'pending',
+            error : 'error',
+            replicating : 'replicating'
+        },
+
         /**
          * Manipulate an element’s local DOM when the element is constructed.
          */
@@ -64,6 +72,7 @@
                 this.db = new PouchDB(dbName)
                 this._find(this.getFind())
             }else{
+                this.setStatus(this.status.error)
                 console.error(new Error('slot "config" needs to have non empty string property "dbName"'))
                 return
             }
@@ -112,6 +121,9 @@
                 var localDB = this.db
                 var self = this
 
+                //set status to pending
+                this.setStatus(this.status.replicating)
+
                 //if there is the changes flag set to true disable changesListener
                 if (suppressChanges) {
                     this._disableChangesListener()
@@ -120,10 +132,12 @@
                 _.merge(options, {ajax : {withCredentials:false}})
 
                 localDB.replicate.from(remoteDB, options).on('complete', function() {
-                    self._find(self.getFind())
                     self._enableChangesListener()
+                    self.setStatus(self.status.idle)
+                    self._find(self.getFind())
                 }).on('error', function(err) {
                     self._enableChangesListener()
+                    self.setStatus(self.status.idle)
                     console.error('error replicating remote db: ', err)
                 })
             } else {
@@ -143,12 +157,15 @@
             var db = this.db
             var self = this
             var findQuery = query || {selector: {_id:""}}
-            console.log(findQuery)
+
+            this.setStatus(this.status.pending)
 
             db.find(findQuery).then(function(result) {
                 self.setResultData(result.docs)
+                self.setStatus(self.status.idle)
             }).catch(function(err) {
-                console.log('error while running find query: ', err)
+                self.setStatus(self.status.idle)
+                console.error('error while running find query: ', err)
             })
         },
 
