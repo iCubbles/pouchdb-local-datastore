@@ -79,4 +79,28 @@ Used to add, edit and delete documents in the connected database.
 
 ### output slots
 #### resultData
+Holds a filtered list of documents stored in the associated local pouch database. The filter is set via input slot `find`.
+If there is no filter set all documents are contained (including `_design` documents). If there is a modification on the 
+internal data or the `find` slot value is set `resultData` slot updates immediately. 
+
+    {
+        "$schema": "http://json-schema.org/draft-04/schema#,
+        "title": "json schema for slot resultData",
+        "type": "array",
+        "items": {
+            "title": "document",
+            "description": "A document from the associated local pouch database",
+            "type": "object"
+        }
+    }
+    
 #### status
+Holds the curent internal status of component. 
+
+    {
+        "$schema": "http://json-schema.org/draft-04/schema#,
+        "title": "json schema for slot status",
+        "type": {
+            "enum": ["idle", "pending", "error", "replicating"]
+        }
+    }
