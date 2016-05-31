@@ -79,6 +79,3 @@ You can do the same using native git-commands only - by doing the following step
         $ git subtree push --prefix devtools cubbles-coder-devtools master
 
 Note: For different _modelVersions_ of a WebPackage surely we need to provide related devtools-Versions. Maybe we manage this with different branches. So be sure to refer to the right branch when using the commands above.
-
-# Releases:
-[[Releases.md]]
