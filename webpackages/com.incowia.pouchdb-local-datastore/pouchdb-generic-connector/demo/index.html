@@ -5,23 +5,7 @@
     <meta charset="UTF-8">
     <title>&lt;pouchdb-generic-connector&gt;</title>
 
-    <script src="../../../cubx.core.rte@1.7.0/webcomponents/webcomponents-lite.js"></script>
-
-    <!--
-        Declare a CRCInit-Object used to initialize the CRC (Client-Runtime-Container):
-        * rootDependencies //a string array; string pattern: webpackageId/artifactId/endpointId
-        ** to refer to artifacts of this webpackage, use 'this' as webpackageId
-    -->
-    <script>
-        window.cubx = {
-            CRCInit: {
-                rootDependencies: [
-                    "this/pouchdb-generic-connector/html-import"
-                ]
-            }
-        }
-    </script>
-
+    <script src="../../../cubx.core.rte@1.9.0/webcomponents/webcomponents-lite.js"></script>
     <!--
         Refer to the crc-loader artifact from a Cubbles-Base.
         Take care: All other dependencies are expected to be available within the same Base!
@@ -29,7 +13,7 @@
         Want to add a 'main' -script to be executed after the dependencies have been loaded?
         If yes, add the following attribute: data-crc-main="js/my-script.js"
     -->
-    <script src="../../../cubx.core.rte@1.7.0/crc-loader/js/main.js" data-CRCInit.loadCIF="true"></script>
+    <script src="../../../cubx.core.rte@1.9.0/crc-loader/js/main.js" data-CRCInit.loadCIF="true"></script>
 
     <!-- include jquery from cdn for json view-->
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
@@ -76,7 +60,7 @@ browser using the PouchDB library.</div>
 </div>
 
 <div cubx-core-crc>
-     <pouchdb-generic-connector></pouchdb-generic-connector>
+     <pouchdb-generic-connector cubx-dependency="this/pouchdb-generic-connector/html-import"></pouchdb-generic-connector>
 </div>
 
 <script>

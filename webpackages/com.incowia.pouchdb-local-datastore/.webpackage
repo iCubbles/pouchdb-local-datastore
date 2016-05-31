@@ -1,7 +1,7 @@
 {
   "uploadConfigs": {
     "release": {
-      "url": "https://www.cubbles.world/sandbox",
+      "url": "https://www.cubbles.world/shared",
       "proxy": "",
       "debug": false
     }
