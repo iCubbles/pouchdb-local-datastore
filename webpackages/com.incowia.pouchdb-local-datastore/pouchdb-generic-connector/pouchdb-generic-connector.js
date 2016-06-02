@@ -26,7 +26,6 @@
          * Manipulate an element’s local DOM when the element is constructed.
          */
         ready: function() {
-            this._init()
         },
 
         modelIndexChanged: function(newValue) {
@@ -56,6 +55,7 @@
         cubxReady : function() {
             //set _cubxReady flag to true
             this._cubxReady = true
+            this._init()
         },
 
         /**
