@@ -49,6 +49,10 @@ Configuration of Database Connection
                     "description": "Object according to 'index' parameter in https://github.com/nolanlawson/pouchdb-find#dbdeleteindexindex--callback",
                     "type": "object"
                 }
+            },
+            "removeExisting": {
+                "type": "boolean",
+                "description": "Recreate local PouchDB with given name instead of using existing one. This ensures that there is always a clean and empty DB on startup. Defaults to false"
             }
         },
         "required" : [
@@ -80,8 +84,8 @@ Used to add, edit and delete documents in the connected database.
 ### output slots
 #### resultData
 Holds a filtered list of documents stored in the associated local pouch database. The filter is set via input slot `find`.
-If there is no filter set all documents are contained (including `_design` documents). If there is a modification on the 
-internal data or the `find` slot value is set `resultData` slot updates immediately. 
+If there is no filter set all documents are contained (including `_design` documents). If there is a modification on the
+internal data or the `find` slot value is set `resultData` slot updates immediately.
 
     {
         "$schema": "http://json-schema.org/draft-04/schema#,
@@ -93,9 +97,9 @@ internal data or the `find` slot value is set `resultData` slot updates immediat
             "type": "object"
         }
     }
-    
+
 #### status
-Holds the curent internal status of component. 
+Holds the curent internal status of component.
 
     {
         "$schema": "http://json-schema.org/draft-04/schema#,

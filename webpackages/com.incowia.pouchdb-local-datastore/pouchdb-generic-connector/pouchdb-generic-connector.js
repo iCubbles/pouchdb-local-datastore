@@ -65,27 +65,46 @@
         _init : function() {
             var config = this.getDbConfig()
             var dbName = config.dbName
+            var removeExisting = config.removeExisting || false
             var indexList = config.indexList
+            var self = this
 
             //create db instance, throw error if no db name is given
             if((typeof  dbName === 'string') && (dbName.length > 0)) {
-                this.db = new PouchDB(dbName)
-                this._find(this.getFind())
+              // remove database with given name to ensure an empty database on for given name
+              if (removeExisting) {
+                this._destroyDb(dbName).then(function(){
+                  self._initLocalDatabase(dbName, indexList)
+                }, function(err){
+                  console.error(err)
+                })
+              } else {
+                this._initLocalDatabase(dbName, indexList)
+              }
             }else{
-                this.setStatus(this.status.error)
-                console.error(new Error('slot "config" needs to have non empty string property "dbName"'))
-                return
+              this.setStatus(this.status.error)
+              console.error(new Error('slot "config" needs to have non empty string property "dbName"'))
             }
+        },
 
-            this._enableChangesListener(true)
+      /**
+       * Create local PouchDB
+       * @param {string} dbName
+       * @param {object} indexList Array of indices
+       * @private
+       */
+        _initLocalDatabase: function(dbName, indexList) {
+          this.db = new PouchDB(dbName)
+          this._find(this.getFind())
+          this._enableChangesListener(true)
 
-            //create db index if there is a value provided in input slot "index"
-            if (indexList) {
-                this._createIndex(indexList)
-            }
+          //create db index if there is a value provided in input slot "index"
+          if (indexList) {
+            this._createIndex(indexList)
+          }
 
-            //synchronize from remotedb if any is given
-            this._synchronizeDataFromCloud()
+          //synchronize from remotedb if any is given
+          this._synchronizeDataFromCloud()
         },
 
         /**
@@ -210,6 +229,16 @@
                 this.changes.cancel()
                 this.changes = null
             }
+        },
+
+      /**
+       * Destroy Database with given name
+       * @param {string} dbName
+       * @return {object} promise
+       * @private
+       */
+        _destroyDb: function(dbName) {
+          return (new PouchDB(dbName)).destroy();
         }
 
 
