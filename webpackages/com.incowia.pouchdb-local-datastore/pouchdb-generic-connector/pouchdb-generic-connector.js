@@ -94,13 +94,23 @@
        * @private
        */
         _initLocalDatabase: function(dbName, indexList) {
+          var find = this.getFind()
+          var self = this
           this.db = new PouchDB(dbName)
-          this._find(this.getFind())
           this._enableChangesListener(true)
 
           //create db index if there is a value provided in input slot "index"
           if (indexList) {
-            this._createIndex(indexList)
+            this._createIndex(indexList).then(function() {
+              //if index creation was successful and there is a value for find apply this value
+              if (find) {
+                self._find(find)
+              }
+            }, function(err) {
+              console.error('error while creating index: ', err)
+            })
+          } else if (find){ // otherwise only process find value if there is a value given
+            this._find(find)
           }
 
           //synchronize from remotedb if any is given
@@ -111,19 +121,27 @@
          * Create list of indexes using pouchDB-find API
          * see https://github.com/nolanlawson/pouchdb-find
          * @param {object} indexList List of indexes
+         * @return {objext} promise
          * @private
          */
         _createIndex : function(indexList) {
-            var db = this.db
+          var db = this.db
+          var promises = []
 
-            _.forEach(indexList, function(index) {
-                db.createIndex({index: index}).then(function(result) {
-                    console.log('index created: ', result)
-                }).catch(function(err){
-                    console.error('error while creating index: ', err)
-                })
+          _.forEach(indexList, function(index) {
+            var promise = new Promise(function(resolve, reject) {
+              db.createIndex({index: index}).then(function(result) {
+                // console.log('index created: ', result)
+                resolve()
+              }).catch(function(err){
+                // console.error('error while creating index: ', err)
+                reject(err)
+              })
             })
+            promises.push(promise)
+          })
 
+          return Promise.all(promises);
         },
 
         /**
@@ -160,9 +178,7 @@
                     console.error('error replicating remote db: ', err)
                 })
             } else {
-                console.error(
-                    new Error('slot "dbConfig" needs to have string property "replication.source" for replicating data')
-                )
+                console.warn('slot "dbConfig" needs to have string property "replication.source" for replicating data')
             }
         },
 
@@ -212,8 +228,8 @@
                 include_docs : false
             })
             changes.on('change', function(change){
-                console.log('change on database docs detected.', change)
-                //set output slot "resultData" with new data
+                // console.log('change on database docs detected.', change)
+                // set output slot "resultData" with new data
                 self._find(self.getFind())
             })
 
